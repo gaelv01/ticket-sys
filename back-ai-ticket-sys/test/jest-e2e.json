@@ -16,7 +16,13 @@
       "jest-html-reporter",
       {
         "pageTitle": "Ticket System E2E Test Report",
-        "outputPath": "test-results-v3.html",
+        "outputPath": "test-results-v3.3.html",
+        "customInfos": [
+          {
+            "title": "Note",
+            "value": "The GEMINI_API_KEY variable was commented out in .env for this test"
+          }
+        ],
         "includeFailureMsg": true,
         "includeConsoleLog": true,
         "theme": "darkTheme"
