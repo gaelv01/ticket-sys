@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:e2e:endpoints": "jest --config ./test/jest-e2e.json --runInBand test/auth.e2e-spec.ts test/users.e2e-spec.ts test/tickets.e2e-spec.ts",
-    "test:e2e:endpoints:cov": "jest --coverage --config ./test/jest-e2e.json --runInBand test/auth.e2e-spec.ts test/users.e2e-spec.ts test/tickets.e2e-spec.ts"
+    "test:e2e:endpoints:cov": "jest --coverage --config ./test/jest-e2e.json --runInBand test/auth.e2e-spec.ts test/users.e2e-spec.ts test/tickets.e2e-spec.ts",
+    "test:e2e:endpoints:html": "jest --config ./test/jest-e2e.json --runInBand test/auth.e2e-spec.ts test/users.e2e-spec.ts test/tickets.e2e-spec.ts && echo 'Reporte generado en: test-results.html'"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -54,6 +55,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.5.0",
+    "jest-html-reporter": "^4.4.0",
     "prettier": "^3.0.0",
     "prisma": "^6.19.3",
     "source-map-support": "^0.5.21",
