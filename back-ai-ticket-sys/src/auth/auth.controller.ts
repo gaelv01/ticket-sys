@@ -35,17 +35,6 @@ export class AuthController {
     return user;
   }
 
-  // Solo ADMIN y AGENTE pueden acceder
-  @Get('staff-only')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.AGENTE)
-  staffOnly(@CurrentUser() user: CurrentUserPayload) {
-    return {
-      message: `Bienvenido al área de staff, ${user.username}`,
-      role: user.role,
-    };
-  }
-
   // Solo ADMIN puede acceder
   @Get('admin-only')
   @UseGuards(JwtAuthGuard, RolesGuard)
