@@ -18,6 +18,40 @@ enum Role {
   CLIENTE
 }
 
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TicketType {
+  CORRECTIVE
+  PREVENTIVE
+}
+
+enum Impact {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum Category {
+  PRODUCTION
+  TECHNICAL
+  ADMINISTRATIVE
+  INFRASTRUCTURE
+  OTHER
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  REOPENED
+}
+
 model User {
   uuid      String   @id @default(uuid())
   username  String   @unique
@@ -26,5 +60,37 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  createdTickets  Ticket[] @relation("CreatedTickets")
+  assignedTickets Ticket[] @relation("AssignedTickets")
+
   @@map("users")
+}
+
+model Ticket {
+  uuid        String       @id @default(uuid())
+  title       String
+  description String
+  severity    Severity
+  type        TicketType
+  impact      Impact
+  category    Category
+  status      TicketStatus @default(OPEN)
+
+  createdById  String
+  createdBy    User    @relation("CreatedTickets", fields: [createdById], references: [uuid])
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedTickets", fields: [assignedToId], references: [uuid])
+
+  // Trazabilidad de la sugerencia de IA
+  aiSuggested  Boolean @default(false)
+  aiConfidence Float?
+  aiPayload    Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tickets")
+  @@index([status])
+  @@index([createdById])
+  @@index([assignedToId])
 }
