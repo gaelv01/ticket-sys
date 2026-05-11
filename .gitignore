@@ -1,11 +1,45 @@
-back-ai-ticket-sys/node_modules
+# =========================
+# BACKEND - NestJS
+# =========================
 
-# compiled output
-/dist
-/node_modules
-/build
+/back-ai-ticket-sys/node_modules
+/back-ai-ticket-sys/dist
+/back-ai-ticket-sys/build
+/back-ai-ticket-sys/coverage
+/back-ai-ticket-sys/.nyc_output
+/back-ai-ticket-sys/generated/prisma
 
-# Logs
+# Backend env files
+/back-ai-ticket-sys/.env
+/back-ai-ticket-sys/.env.development.local
+/back-ai-ticket-sys/.env.test.local
+/back-ai-ticket-sys/.env.production.local
+/back-ai-ticket-sys/.env.local
+
+
+# =========================
+# FRONTEND
+# =========================
+
+/front-ai-ticket-sys/node_modules
+/front-ai-ticket-sys/dist
+/front-ai-ticket-sys/build
+/front-ai-ticket-sys/.next
+/front-ai-ticket-sys/out
+/front-ai-ticket-sys/coverage
+
+# Frontend env files
+/front-ai-ticket-sys/.env
+/front-ai-ticket-sys/.env.local
+/front-ai-ticket-sys/.env.development.local
+/front-ai-ticket-sys/.env.test.local
+/front-ai-ticket-sys/.env.production.local
+
+
+# =========================
+# LOGS
+# =========================
+
 logs
 *.log
 npm-debug.log*
@@ -14,53 +48,73 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# OS
+
+# =========================
+# OS FILES
+# =========================
+
 .DS_Store
+Thumbs.db
 
-# Tests
-/coverage
-/.nyc_output
 
-# IDEs and editors
-/.idea
+# =========================
+# TEMP FILES
+# =========================
+
+.temp
+.tmp
+
+
+# =========================
+# RUNTIME DATA
+# =========================
+
+pids
+*.pid
+*.seed
+*.pid.lock
+
+
+# =========================
+# DIAGNOSTIC REPORTS
+# =========================
+
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+
+# =========================
+# IDEs & EDITORS
+# =========================
+
+.idea
 .project
 .classpath
-.c9/
-*.launch
-.settings/
+.c9
+.settings
 *.sublime-workspace
 
-# IDE - VSCode
+
+# =========================
+# VS CODE
+# =========================
+
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
 
-# temp directory
-.temp
-.tmp
+# =========================
+# DOCKER
+# =========================
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
+docker-data
+postgres-data
 
-# Diagnostic reports (https://nodejs.org/api/report.html)
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-/generated/prisma
+# =========================
+# OPTIONAL
+# =========================
 
-/generated/prisma
-
-/generated/prisma
-
-/generated/prisma
+*.local
