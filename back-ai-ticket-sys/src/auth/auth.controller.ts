@@ -38,6 +38,18 @@ export class AuthController {
   // Cualquier usuario autenticado puede consultar su propio perfil
   @Get('profile')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
+  @ApiResponse({
+    status: 200,
+    description: 'Perfil del usuario autenticado',
+    schema: {
+      example: {
+        uuid: 'c8693bcd-d655-48e6-be02-ef56c0ee7570',
+        username: 'admin',
+        role: 'ADMIN',
+      },
+    },
+  })
   getProfile(@CurrentUser() user: CurrentUserPayload) {
     return user;
   }
