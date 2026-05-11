@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
+import { visualCheck } from "./applitools";
 
 // ─────────────────────────────────────────────
 //  Config
@@ -290,6 +291,9 @@ test.describe("IncidentFlow — Login Route", () => {
 
         // Buscar 'admin' sin importar mayúsculas/minúsculas
         await expect(page.getByText(/admin/i)).toBeVisible();
+
+        // Captura visual con Applitools (si está configurado)
+        await visualCheck(page, "Dashboard | test");
     });
 
     // ── 18. Login con Ctest y búsqueda de 'client' dentro del dashboard ──────
