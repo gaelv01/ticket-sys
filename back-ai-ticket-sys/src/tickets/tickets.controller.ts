@@ -27,7 +27,7 @@ import {
   CurrentUserPayload,
 } from '../auth/decorators/current-user.decorator';
 import { ApiAuth } from '../auth/decorators/api.decorator';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('tickets')
 @ApiAuth()
@@ -61,11 +61,61 @@ export class TicketsController {
   }
 
   @Get('metrics/dashboard')
+  @ApiOperation({ summary: 'Obtener métricas del dashboard' })
+  @ApiOkResponse({
+    description: 'Métricas del dashboard con contadores y distribución de categorías',
+    schema: {
+      example: {
+        counters: {
+          open: {
+            value: 1,
+            deltaToday: 1,
+          },
+          critical: {
+            value: 1,
+            deltaToday: 1,
+          },
+          resolved: {
+            value: 0,
+            deltaToday: 0,
+          },
+          avgResolutionMinutes: 0,
+        },
+        categoryDistribution: [
+          {
+            category: 'PRODUCTION',
+            count: 1,
+            percentage: 100,
+          },
+        ],
+      },
+    },
+  })
   getDashboardMetrics() {
     return this.ticketsService.getDashboardMetrics();
   }
 
   @Get()
+  @ApiOperation({ summary: 'Listar tickets con filtros y paginación' })
+  @ApiQuery({ name: 'status', required: false, description: 'Filtrar por estado (OPEN, IN_PROGRESS, RESOLVED, ...)' })
+  @ApiQuery({ name: 'severity', required: false, description: 'Filtrar por severidad (CRITICAL, HIGH, MEDIUM, LOW)' })
+  @ApiQuery({ name: 'page', required: false, description: 'Página (1-based)', example: 1 })
+  @ApiQuery({ name: 'limit', required: false, description: 'Cantidad por página', example: 5 })
+  @ApiQuery({ name: 'search', required: false, description: 'Búsqueda por texto en título/descripcion' })
+  @ApiOkResponse({
+    description: 'Listado paginado de tickets según filtros',
+    schema: {
+      example: {
+        items: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 5,
+          totalPages: 0,
+        },
+      },
+    },
+  })
   findAll(@Query() filters: ListTicketsDto) {
     return this.ticketsService.findAll(filters);
   }
@@ -142,7 +192,9 @@ export class TicketsController {
           uuid: 'a49997dd-8066-4da1-a493-91efc65763a0',
           username: 'Ctest',
           role: 'CLIENTE'
-        }
+        },
+        comments: [],
+        events: []
       }
     }
   })
@@ -151,6 +203,48 @@ export class TicketsController {
   }
 
   @Patch(':uuid')
+  @ApiOperation({ summary: 'Actualizar información del ticket' })
+  @ApiBody({
+    description: 'Campos editables del ticket. Puedes enviar uno o varios campos según lo que necesites modificar.',
+    type: UpdateTicketDto,
+    examples: {
+      actualizarTicket: {
+        summary: 'Ejemplo de actualización completa del ticket',
+        value: {
+          uuid: 'c819497c-c0df-4b30-9840-5fb82bdd117e',
+          title: 'Servidor caído - URGENTE',
+          description: 'El servidor de producción principal dejó de responder...',
+          severity: 'CRITICAL',
+          type: 'CORRECTIVE',
+          impact: 'HIGH',
+          category: 'PRODUCTION',
+          status: 'IN_PROGRESS',
+          createdById: 'a49997dd-8066-4da1-a493-91efc65763a0',
+          assignedToId: 'a49997dd-8066-4da1-a493-91efc65763a0',
+          aiSuggested: true,
+          aiConfidence: 0.94,
+          aiPayload: {
+            type: 'CORRECTIVE',
+            impact: 'HIGH',
+            category: 'PRODUCTION',
+            severity: 'CRITICAL',
+          },
+          createdAt: '2026-05-11T06:52:49.618Z',
+          updatedAt: '2026-05-11T13:31:37.265Z',
+          createdBy: {
+            uuid: 'a49997dd-8066-4da1-a493-91efc65763a0',
+            username: 'Ctest',
+            role: 'CLIENTE',
+          },
+          assignedTo: {
+            uuid: 'a49997dd-8066-4da1-a493-91efc65763a0',
+            username: 'Ctest',
+            role: 'CLIENTE',
+          },
+        },
+      },
+    },
+  })
   update(
     @Param('uuid', ParseUUIDPipe) uuid: string,
     @Body() dto: UpdateTicketDto,
@@ -162,6 +256,19 @@ export class TicketsController {
   @Patch(':uuid/status')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Actualizar estado del ticket' })
+  @ApiBody({
+    description: 'Nuevo estado del ticket',
+    type: UpdateStatusDto,
+    examples: {
+      inProgress: {
+        summary: 'Mover el ticket a en progreso',
+        value: {
+          status: 'IN_PROGRESS',
+        },
+      },
+    },
+  })
   changeStatus(
     @Param('uuid', ParseUUIDPipe) uuid: string,
     @Body() dto: UpdateStatusDto,
@@ -172,6 +279,19 @@ export class TicketsController {
 
   @Post(':uuid/comments')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Agregar comentario a un ticket' })
+  @ApiBody({
+    description: 'Contenido del comentario a agregar al ticket',
+    type: CreateCommentDto,
+    examples: {
+      comentarioEjemplo: {
+        summary: 'Ejemplo de comentario',
+        value: {
+          content: 'Estoy revisando los logs del servidor.',
+        },
+      },
+    },
+  })
   addComment(
     @Param('uuid', ParseUUIDPipe) uuid: string,
     @Body() dto: CreateCommentDto,
