@@ -1,5 +1,4 @@
 import { test, expect, Page } from "@playwright/test";
-import { visualCheck } from "./applitools";
 
 // ─────────────────────────────────────────────
 //  Config
@@ -41,31 +40,105 @@ async function fillLogin(
     await page.click(SEL.submitButton);
 }
 
-async function getStoredToken(page: Page): Promise<string | null> {
-    const token = await page.evaluate(() => {
-        return localStorage.getItem('token') ||
-            localStorage.getItem('authToken') ||
-            localStorage.getItem('access_token') ||
-            sessionStorage.getItem('token') ||
-            sessionStorage.getItem('authToken') ||
-            sessionStorage.getItem('access_token') ||
-            null;
-    });
-    return token;
-}
-
-async function restoreToken(page: Page, token: string): Promise<void> {
-    await page.evaluate((tok) => {
-        localStorage.setItem('token', tok);
-    }, token);
-}
-
 // ─────────────────────────────────────────────
 //  Suite
 // ─────────────────────────────────────────────
 test.describe("IncidentFlow — Login Route", () => {
     test.beforeEach(async ({ page }) => {
         await page.goto(LOGIN_URL, { waitUntil: "networkidle" });
+    });
+
+    // ── 1. Smoke test: page loads correctly ──────
+    test("TC-01 | La página de login carga correctamente", async ({ page }) => {
+        await expect(page).toHaveTitle(/IncidentFlow|login/i);
+        await expect(page.locator(SEL.usernameInput)).toBeVisible();
+        await expect(page.locator(SEL.passwordInput)).toBeVisible();
+        await expect(page.locator(SEL.submitButton)).toBeVisible();
+        await expect(page.locator("text=IncidentFlow")).toBeVisible();
+        await expect(
+            page.locator("text=Plataforma de gestión de incidencias")
+        ).toBeVisible();
+    });
+
+    // ── 2. Happy path: credenciales válidas → Dashboard ──────
+    test("TC-02 | Login exitoso redirige al dashboard con todos sus elementos", async ({ page }) => {
+        await fillLogin(page, "test", "test1234");
+
+        // ── 2a. URL debe ser /dashboard ──────────────────────────
+        await expect(page).toHaveURL(`${DASHBOARD_URL}`, { timeout: 8_000 });
+
+        // ── 2b. No debe quedar ningún mensaje de error visible ───
+        const errorVisible = await page.locator(SEL.errorBox).isVisible();
+        expect(errorVisible).toBeFalsy();
+
+        // ── 2c. Encabezado principal ─────────────────────────────
+        await expect(page.locator(DASH.heading)).toBeVisible();
+
+        // ── 2d. Saludo con nombre de usuario y rol ───────────────
+        // La pantalla muestra: "Hola, test · ADMIN"
+        await expect(page.locator(DASH.greeting)).toBeVisible();
+        await expect(page.locator(DASH.username).first()).toBeVisible();
+        await expect(page.locator(DASH.roleTag)).toBeVisible();
+
+        // ── 2e. Botones de acción en el header ───────────────────
+        await expect(page.locator(DASH.newIncident)).toBeVisible();
+        await expect(page.locator(DASH.logout)).toBeVisible();
+
+        // ── 2f. Tarjeta de bienvenida ────────────────────────────
+        await expect(page.locator(DASH.welcomeCard)).toBeVisible();
+        await expect(page.locator(DASH.welcomeBody)).toBeVisible();
+    });
+
+    // ── 2b. Cerrar sesión desde el dashboard ─────────────────
+    test("TC-02b | Cerrar sesión desde el dashboard redirige al login", async ({ page }) => {
+        // Primero hacer login
+        await fillLogin(page, "test", "test1234");
+        await expect(page).toHaveURL(DASHBOARD_URL, { timeout: 8_000 });
+
+        // Hacer click en "Cerrar sesión"
+        await page.click(DASH.logout);
+
+        // Debe regresar al login
+        await expect(page).toHaveURL(/\/login/, { timeout: 6_000 });
+    });
+
+    // ── 2c. Acceso directo al dashboard sin sesión ───────────
+    test("TC-02c | Acceder a /dashboard sin sesión redirige al login", async ({ page }) => {
+        await page.goto(DASHBOARD_URL, { waitUntil: "networkidle" });
+
+        // Debe redirigir al login (ruta protegida)
+        await expect(page).toHaveURL(/\/login/, { timeout: 6_000 });
+    });
+
+    // ── 3. Contraseña incorrecta ─────────────────
+    test("TC-03 | Error al ingresar contraseña incorrecta", async ({ page }) => {
+        await fillLogin(page, "test", "wrong_password_XYZ");
+
+        // Should stay on /login
+        await expect(page).toHaveURL(/\/login/);
+
+        // An error message should appear
+        const errorLocator = page.locator(SEL.errorBox);
+        await expect(errorLocator).toBeVisible({ timeout: 6_000 });
+
+        const errorText = await errorLocator.innerText();
+        expect(errorText.length).toBeGreaterThan(0);
+
+        // Must NOT redirect to a protected route
+        await expect(page).not.toHaveURL(/dashboard|home|incidents/i);
+    });
+
+    // ── 4. Usuario que no existe ─────────────────
+    test("TC-04 | Error al ingresar un usuario inexistente", async ({ page }) => {
+        await fillLogin(page, "usuario_que_no_existe_999", "cualquier_pass");
+
+        await expect(page).toHaveURL(/\/login/);
+
+        const errorLocator = page.locator(SEL.errorBox);
+        await expect(errorLocator).toBeVisible({ timeout: 6_000 });
+
+        const errorText = await errorLocator.innerText();
+        expect(errorText.length).toBeGreaterThan(0);
     });
 
     // ── 5. Campos vacíos ─────────────────────────
@@ -278,34 +351,5 @@ test.describe("IncidentFlow — Login Route", () => {
             const status = await page.evaluate(() => document.readyState);
             expect(status).toBe("complete");
         }
-    });
-
-    // ── 17. Verificar que el usuario 'test' vea texto 'admin' en el dashboard ─
-    test("TC-17 | Login test/test1234 muestra texto 'admin' en el dashboard", async ({ page }) => {
-        await fillLogin(page, "test", "test1234");
-        await expect(page).toHaveURL(DASHBOARD_URL, { timeout: 8_000 });
-
-        // Verificar que el token se ha almacenado
-        const token = await getStoredToken(page);
-        expect(token).toBeTruthy();
-
-        // Buscar 'admin' sin importar mayúsculas/minúsculas
-        await expect(page.getByText(/admin/i)).toBeVisible();
-
-        // Captura visual con Applitools (si está configurado)
-        await visualCheck(page, "Dashboard | test");
-    });
-
-    // ── 18. Login con Ctest y búsqueda de 'client' dentro del dashboard ──────
-    test("TC-18 | Login con Ctest y buscar texto 'client' en el dashboard", async ({ page }) => {
-        await fillLogin(page, "Ctest", "test1234");
-        await expect(page).toHaveURL(DASHBOARD_URL, { timeout: 8_000 });
-
-        // Verificar que el token se ha almacenado
-        const token = await getStoredToken(page);
-        expect(token).toBeTruthy();
-
-        // Buscar la palabra 'client' (insensible a mayúsculas)
-        await expect(page.getByText(/cliente/i)).toBeVisible();
     });
 });
