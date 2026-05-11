@@ -16,7 +16,7 @@
       "jest-html-reporter",
       {
         "pageTitle": "Ticket System E2E Test Report",
-        "outputPath": "test-results-v2.html",
+        "outputPath": "test-results-v3.html",
         "includeFailureMsg": true,
         "includeConsoleLog": true,
         "theme": "darkTheme"

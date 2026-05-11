@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:e2e:endpoints": "jest --config ./test/jest-e2e.json --runInBand test/auth.e2e-spec.ts test/users.e2e-spec.ts test/tickets.e2e-spec.ts",
     "test:e2e:endpoints:cov": "jest --coverage --config ./test/jest-e2e.json --runInBand test/auth.e2e-spec.ts test/users.e2e-spec.ts test/tickets.e2e-spec.ts",
-    "test:e2e:endpoints:html": "jest --config ./test/jest-e2e.json --runInBand test/auth.e2e-spec.ts test/users.e2e-spec.ts test/tickets.e2e-spec.ts && echo 'Reporte generado en: test-results.html'"
+    "test:e2e:endpoints:html": "jest --config ./test/jest-e2e.json --runInBand test/auth.e2e-spec.ts test/users.e2e-spec.ts test/tickets.e2e-spec.ts test/tickets-classify-fallback.e2e-spec.ts && echo 'Reporte generado en: test-results.html'"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
