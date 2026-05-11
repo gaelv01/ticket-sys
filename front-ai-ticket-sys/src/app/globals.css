@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+:root {
+  /* Paleta del sistema de incidencias */
+  --color-primary: #2563eb;        /* azul para acciones primarias */
+  --color-primary-hover: #1d4ed8;
+  --color-danger: #dc2626;         /* rojo para errores y críticos */
+  --color-success: #16a34a;        /* verde para resoluciones */
+  --color-warning: #ca8a04;        /* amarillo para advertencias */
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  --color-muted: #6b7280;
+  --color-border: #e5e7eb;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
