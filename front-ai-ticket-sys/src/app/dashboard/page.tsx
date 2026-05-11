@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut } from 'lucide-react';
+import { LogOut, Plus } from 'lucide-react';
 import { authStorage, UserSession } from '@/lib/auth';
 
 export default function DashboardPage() {
@@ -36,13 +36,22 @@ export default function DashboardPage() {
               <span className="text-primary">{user.role}</span>
             </p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-card border border-card-border rounded-lg hover:bg-input transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            Cerrar sesión
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => router.push('/tickets/new')}
+              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Nueva incidencia
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 bg-card border border-card-border rounded-lg hover:bg-input transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Cerrar sesión
+            </button>
+          </div>
         </header>
 
         <section className="mt-8 p-6 rounded-xl border border-card-border bg-card">
