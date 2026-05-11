@@ -1,20 +1,38 @@
 @import "tailwindcss";
 
-:root {
-  /* Paleta del sistema de incidencias */
-  --color-primary: #2563eb;        /* azul para acciones primarias */
-  --color-primary-hover: #1d4ed8;
-  --color-danger: #dc2626;         /* rojo para errores y críticos */
-  --color-success: #16a34a;        /* verde para resoluciones */
-  --color-warning: #ca8a04;        /* amarillo para advertencias */
-  --color-background: #ffffff;
-  --color-foreground: #0a0a0a;
-  --color-muted: #6b7280;
-  --color-border: #e5e7eb;
+@theme {
+  /* Base - dark theme */
+  --color-background: #0a0a0a;
+  --color-foreground: #fafafa;
+
+  /* Surfaces */
+  --color-card: #161616;
+  --color-card-border: #262626;
+  --color-input: #1a1a1a;
+  --color-input-border: #2a2a2a;
+
+  /* Text */
+  --color-muted: #71717a;
+  --color-muted-light: #a1a1aa;
+
+  /* Primary - indigo */
+  --color-primary: #6366f1;
+  --color-primary-hover: #5b5bd6;
+
+  /* Estados */
+  --color-danger: #ef4444;
+  --color-danger-bg: #1f0a0a;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+}
+
+html, body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  min-height: 100vh;
 }
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
   font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
